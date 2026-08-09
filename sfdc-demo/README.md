@@ -27,6 +27,27 @@ uvicorn main:app --reload --port 8000
 
 ブラウザで http://localhost:8000 を開く。
 
+## お客様に公開する(cloudflared トンネル)
+
+デモ当日だけ一時的に公開URLを発行する方法。無料でアカウント不要、コードを書き換えても
+再デプロイ不要で即反映されるため、モダナイゼーションのデモに向いています。
+
+```bash
+# 1. cloudflared を取得(初回のみ)
+curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod +x cloudflared
+# macOS の場合: brew install cloudflared
+
+# 2. アプリを起動(別ターミナル)
+cd sfdc-demo && uvicorn main:app --port 8000
+
+# 3. トンネルを開く
+./cloudflared tunnel --url http://localhost:8000
+```
+
+出力に表示される `https://<ランダム名>.trycloudflare.com` をお客様に共有します。
+URLはトンネルを停止するまで有効(停止すると失効し、次回は別のURLになります)。
+
 ## 構成
 
 - `main.py` — FastAPIバックエンド。インメモリのシードデータとJSON API

@@ -7,6 +7,7 @@
 import random
 import string
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -57,6 +58,8 @@ def create_reservation(body: ReservationIn):
         raise HTTPException(status_code=404, detail="該当便が存在しません")
     if flight["status"] == "欠航":
         raise HTTPException(status_code=400, detail="欠航便のため予約できません")
+    if flight["seats_booked"] >= flight["seats_total"]:
+        raise HTTPException(status_code=400, detail="満席のため予約できません")
     pnr = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
     rec = {
         "pnr": pnr,
@@ -112,6 +115,8 @@ def transfer(body: TransferIn):
     dst = next((a for a in ACCOUNTS if a["account_no"] == body.to_no), None)
     if src is None or dst is None:
         raise HTTPException(status_code=404, detail="口座番号が存在しません")
+    if body.from_no == body.to_no:
+        raise HTTPException(status_code=400, detail="同一口座への振込はできません")
     if body.amount <= 0:
         raise HTTPException(status_code=400, detail="金額が不正です")
     if src["balance"] < body.amount:
@@ -187,4 +192,4 @@ def register_sale(body: SaleIn):
     return rec
 
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")

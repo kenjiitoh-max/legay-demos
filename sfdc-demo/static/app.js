@@ -3,6 +3,15 @@
 function $(sel) { return document.querySelector(sel); }
 function $all(sel) { return document.querySelectorAll(sel); }
 
+function esc(v) {
+  return String(v)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function api(path, opts) {
   return fetch(path, opts).then(function (r) {
     return r.json().then(function (body) {
@@ -60,8 +69,8 @@ function loadReservations() {
     tbody.innerHTML = "";
     rows.forEach(function (r) {
       tbody.innerHTML +=
-        "<tr><td>" + r.pnr + "</td><td>" + r.name + "</td><td>" + r.flight_no +
-        "</td><td>" + r["class"] + "</td><td>" + r.status + "</td><td>" + r.created + "</td></tr>";
+        "<tr><td>" + esc(r.pnr) + "</td><td>" + esc(r.name) + "</td><td>" + esc(r.flight_no) +
+        "</td><td>" + esc(r["class"]) + "</td><td>" + esc(r.status) + "</td><td>" + esc(r.created) + "</td></tr>";
     });
   });
 }
@@ -112,7 +121,7 @@ function loadTransactions() {
       tbody.innerHTML +=
         "<tr><td>" + t.id + "</td><td>" + t.date + "</td><td>" + t.from_no +
         "</td><td>" + t.to_no + "</td><td style='text-align:right'>" +
-        t.amount.toLocaleString() + "</td><td>" + t.memo + "</td><td>" + t.status + "</td></tr>";
+        t.amount.toLocaleString() + "</td><td>" + esc(t.memo) + "</td><td>" + esc(t.status) + "</td></tr>";
     });
   });
 }
@@ -163,8 +172,8 @@ function loadSales() {
     tbody.innerHTML = "";
     rows.forEach(function (s) {
       tbody.innerHTML +=
-        "<tr><td>" + s.id + "</td><td>" + s.date + "</td><td>" + s.sku +
-        "</td><td style='text-align:right'>" + s.qty + "</td><td>" + s.store + "</td></tr>";
+        "<tr><td>" + s.id + "</td><td>" + esc(s.date) + "</td><td>" + esc(s.sku) +
+        "</td><td style='text-align:right'>" + s.qty + "</td><td>" + esc(s.store) + "</td></tr>";
     });
   });
 }
